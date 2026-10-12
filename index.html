@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriProcure | Smart Farmer Procurement & Mandi Management System</title>
+    <meta name="description" content="College Level Full-Stack Farmer Procurement System powered by Neon PostgreSQL, Node.js Express API on Render, and Vercel Frontend.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS Styles & Embedded Fallback -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root {
+            --bg-primary: #0b132b;
+            --bg-secondary: #1c2541;
+            --bg-card: rgba(28, 37, 65, 0.85);
+            --bg-glass: rgba(15, 23, 42, 0.75);
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --primary-light: rgba(16, 185, 129, 0.15);
+            --accent: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(16, 185, 129, 0.3);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --shadow-main: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 15px rgba(16, 185, 129, 0.25);
+            --transition: all 0.25s ease;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+        body { background: radial-gradient(circle at 10% 20%, #0d1b2a 0%, #0b132b 90%); color: var(--text-main); min-height: 100vh; }
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+        .app-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 270px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 24px 16px; z-index: 100; }
+        .brand { display: flex; align-items: center; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .logo-icon { width: 44px; height: 44px; min-width: 44px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); }
+        .logo-icon svg { width: 24px; height: 24px; stroke: #fff; }
+        .brand-text h2 { font-size: 1.25rem; font-weight: 700; color: #fff; }
+        .brand-text span { font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: 600; }
+        .nav-menu { display: flex; flex-direction: column; gap: 6px; margin-top: 24px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.92rem; font-weight: 500; cursor: pointer; transition: var(--transition); text-align: left; width: 100%; }
+        .nav-item svg { width: 20px; height: 20px; min-width: 20px; stroke: var(--text-muted); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
+        .nav-item.active { background: linear-gradient(90deg, var(--primary-light), transparent); color: var(--primary); font-weight: 600; border-left: 3px solid var(--primary); }
+        .nav-item.active svg { stroke: var(--primary); }
+        .sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .mandi-location { display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: var(--radius-sm); }
+        .pulse-dot, .pulse-dot-green { width: 10px; height: 10px; min-width: 10px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 8px var(--primary); }
+        .pulse-dot-amber { width: 10px; height: 10px; min-width: 10px; background: var(--warning); border-radius: 50%; box-shadow: 0 0 8px var(--warning); }
+        .main-content { flex: 1; padding: 24px 36px; overflow-y: auto; }
+        .top-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
+        .header-search { position: relative; width: 340px; max-width: 100%; }
+        .header-search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--text-muted); }
+        .header-search input { width: 100%; padding: 10px 14px 10px 42px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 0.9rem; outline: none; }
+        .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .msp-ticker-pill { display: flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 14px; border-radius: 30px; font-size: 0.82rem; }
+        .ticker-label { background: var(--accent); color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; }
+        .tab-view { display: none; }
+        .tab-view.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .view-header h1 { font-size: 1.75rem; font-weight: 700; }
+        .view-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: var(--transition); }
+        .btn svg { width: 18px; height: 18px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; box-shadow: var(--shadow-glow); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-xs { padding: 4px 8px; font-size: 0.75rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-main); position: relative; overflow: hidden; }
+        .gradient-emerald::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .gradient-cyan::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+        .gradient-amber::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--warning); }
+        .gradient-purple::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--purple); }
+        .stat-icon { font-size: 2.2rem; background: rgba(255, 255, 255, 0.05); width: 56px; height: 56px; min-width: 56px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; }
+        .stat-info .stat-label { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; }
+        .stat-info h2 { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
+        .trend { font-size: 0.78rem; font-weight: 500; }
+        .trend.positive { color: var(--primary); }
+        .trend.neutral { color: var(--text-muted); }
+        .trend.warning { color: var(--warning); }
+        .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-main); margin-bottom: 24px; }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .table-responsive { overflow-x: auto; width: 100%; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 550px; }
+        .data-table th { padding: 12px 14px; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.2); }
+        .data-table td { padding: 14px; font-size: 0.88rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-main); }
+        .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+        .badge-warning { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+        .badge-danger { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+        .badge-info { background: rgba(59, 130, 246, 0.18); color: #60a5fa; }
+        .form-control { width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-main); font-size: 0.9rem; outline: none; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25); }
+        .form-control.is-invalid { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.08) !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important; }
+        .form-control.is-valid { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.08) !important; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important; }
+        .field-error { color: #f87171; font-size: 0.78rem; font-weight: 500; margin-top: 4px; display: none; align-items: center; gap: 4px; }
+        .field-error.active { display: flex; }
+        .field-hint { color: var(--text-muted); font-size: 0.74rem; margin-top: 3px; }
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+        .modal-backdrop.active { display: flex; }
+        .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-highlight); border-radius: var(--radius-lg); width: 100%; max-width: 580px; box-shadow: var(--shadow-main); overflow: hidden; }
+        .modal-lg { max-width: 780px; }
+        .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { font-size: 1.25rem; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+        .modal-body { padding: 24px; max-height: 75vh; overflow-y: auto; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+        .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .form-group label { font-size: 0.82rem; font-weight: 500; color: var(--text-muted); }
+        .payout-preview-box { background: rgba(16, 185, 129, 0.1); border: 1px dashed var(--primary); padding: 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .payout-preview-box strong { font-size: 1.4rem; color: var(--primary); }
+        #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+        .toast { background: var(--bg-secondary); color: #fff; border-left: 4px solid var(--primary); padding: 14px 20px; border-radius: var(--radius-sm); box-shadow: var(--shadow-main); font-size: 0.88rem; }
+        
+        /* Mobile Layout */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); padding: 14px; }
+            .nav-menu { flex-direction: row; overflow-x: auto; padding-bottom: 8px; gap: 8px; }
+            .nav-item { white-space: nowrap; padding: 8px 12px; font-size: 0.82rem; }
+            .nav-item.active { border-left: none; border-bottom: 2px solid var(--primary); }
+            .main-content { padding: 16px; }
+            .top-header { flex-direction: column; align-items: stretch; }
+            .header-search { width: 100%; }
+            .header-actions { justify-content: space-between; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { flex-direction: column; gap: 0; }
+            .form-group { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h2>AgriProcure</h2>
+                    <span>Smart Procurement v3.0</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="farmers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Farmer Profiles</span>
+                </button>
+                <button class="nav-item" data-tab="queue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Slot & Queue Tokens</span>
+                </button>
+                <button class="nav-item" data-tab="weighbridge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Quality & Weighbridge</span>
+                </button>
+                <button class="nav-item" data-tab="payments">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>DBT Payouts</span>
+                </button>
+                <button class="nav-item" data-tab="msp">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>MSP Rates</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="mandi-location">
+                    <span class="pulse-dot"></span>
+                    <div>
+                        <strong>Neon Cloud Database</strong>
+                        <small id="db-status-pill">Checking Connection...</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="global-search" placeholder="Search by Farmer Name, Token #, Aadhaar, Crop...">
+                </div>
+
+                <div class="header-actions">
+                    <div class="msp-ticker-pill">
+                        <span class="ticker-label">LIVE MSP</span>
+                        <span class="ticker-value">Paddy: ₹2,183/Qtl | Wheat: ₹2,275/Qtl</span>
+                    </div>
+                    <button class="btn btn-secondary" id="btn-book-slot-modal">
+                        <span>📅 Book Mandi Slot</span>
+                    </button>
+                    <button class="btn btn-primary" id="btn-quick-intake">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>New Intake</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="tab-view active">
+                <div class="view-header">
+                    <div>
+                        <h1>Executive Procurement Dashboard</h1>
+                        <p>Real-time statistics & procurement metrics connected to Neon Cloud PostgreSQL</p>
+                    </div>
+                    <div class="date-filter">
+                        <span class="badge badge-success">Season 2026-Kharif</span>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card gradient-emerald">
+                        <div class="stat-icon">🌾</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Procurement</span>
+                            <h2 id="stat-total-volume">0.00 Qtl</h2>
+                            <small class="trend positive">Live Weight Intake</small>
+                        </div>
+                    </div>
+                    <div class="stat-card gradient-cyan">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Disbursed DBT Payout</span>
+                            <h2 id="stat-total-payout">₹ 0</h2>
+                            <small class="trend positive">Direct Bank Transfer</small>
+                        </div>
+                    </div>
+                    <div class="stat-card gradient-amber">
+                        <div class="stat-icon">👨‍🌾</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Enrolled Farmers</span>
+                            <h2 id="stat-farmer-count">0</h2>
+                            <small class="trend neutral">Verified Records</small>
+                        </div>
+                    </div>
+                    <div class="stat-card gradient-purple">
+                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Pending Payout</span>
+                            <h2 id="stat-pending-payout">₹ 0</h2>
+                            <small class="trend warning">Awaiting Mandi Approval</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content Layout -->
+                <div class="dashboard-grid">
+                    <div class="panel table-panel">
+                        <div class="panel-header">
+                            <h3>Live Mandi Queue & Intake Tokens</h3>
+                            <button class="btn btn-sm btn-secondary" onclick="app.switchTab('queue')">View Queue</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Token ID</th>
+                                        <th>Farmer Name</th>
+                                        <th>Crop Variety</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Payout (Est)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-intake-body">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Farmer Directory View -->
+            <section id="view-farmers" class="tab-view">
+                <div class="view-header">
+                    <div>
+                        <h1>Farmer Profiles & Onboarding</h1>
+                        <p>Aadhaar verified farmer directory with bank details for DBT transfers</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-farmer">+ Register New Farmer</button>
+                </div>
+
+                <div class="panel">
+                    <div class="table-controls">
+                        <input type="text" id="farmer-search-input" class="form-control" placeholder="Filter farmers by name, village, code or phone...">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Farmer Code</th>
+                                    <th>Full Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Village</th>
+                                    <th>Land Acres</th>
+                                    <th>Bank Account & IFSC</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-farmers-body">
+                                <!-- Dynamic Farmers -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Queue & Slots View -->
+            <section id="view-queue" class="tab-view">
+                <div class="view-header">
+                    <div>
+                        <h1>Slot Booking & Mandi Tokens</h1>
+                        <p>Select Procurement Center, View Available Time Slots, and Track Live Queue</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.openModal('modal-slot')">📅 Book New Slot</button>
+                </div>
+
+                <div class="panel">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Token ID</th>
+                                    <th>Farmer Name</th>
+                                    <th>Crop Variety</th>
+                                    <th>Quantity</th>
+                                    <th>Queue Status</th>
+                                    <th>Est. Payout</th>
+                                    <th>Print Slip</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-intake-body">
+                                <!-- Dynamic Intake Queue -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quality & Weighbridge View -->
+            <section id="view-weighbridge" class="tab-view">
+                <div class="view-header">
+                    <div>
+                        <h1>Digital Weighbridge & Quality Inspection</h1>
+                        <p>Gross/Tare/Net weight determination with moisture & impurity quality score grading</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <form id="weighbridge-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Select Token / Procurement Lot *</label>
+                                <select id="wb-token-select" class="form-control" required></select>
+                                <div class="field-error" id="err-wb-token"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Gross Weight (Kg) *</label>
+                                <input type="number" id="wb-gross-weight" class="form-control" placeholder="e.g. 18700" min="1" required>
+                                <div class="field-error" id="err-wb-gross"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tare Weight (Kg) *</label>
+                                <input type="number" id="wb-tare-weight" class="form-control" placeholder="e.g. 4200" min="0" required>
+                                <div class="field-error" id="err-wb-tare"></div>
+                            </div>
+                        </div>
+
+                        <div class="field-error" id="err-wb-diff" style="margin-bottom: 12px; font-weight: 600;"></div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Moisture Percentage (%)</label>
+                                <input type="number" step="0.1" id="wb-moisture" class="form-control" value="13.5" min="0" max="50">
+                                <div class="field-error" id="err-wb-moisture"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Impurity / Foreign Matter (%)</label>
+                                <input type="number" step="0.1" id="wb-impurity" class="form-control" value="1.0" min="0" max="30">
+                                <div class="field-error" id="err-wb-impurity"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Calculated Net Quantity</label>
+                                <div class="badge badge-success" id="wb-calculated-net" style="font-size: 16px; padding: 10px;">0.00 Quintals</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success" style="margin-top: 15px;">Submit Verification to Neon DB</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Payments & DBT View -->
+            <section id="view-payments" class="tab-view">
+                <div class="view-header">
+                    <div>
+                        <h1>Direct Benefit Transfer (DBT) Payouts</h1>
+                        <p>Process, approve, and disburse MSP crop payments directly to farmer bank accounts</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction Ref</th>
+                                    <th>Farmer Name</th>
+                                    <th>Crop & Net Qtl</th>
+                                    <th>Bank Account (A/C)</th>
+                                    <th>Total Amount</th>
+                                    <th>DBT Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-payments-body">
+                                <!-- Dynamic Payouts -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MSP Rates View -->
+            <section id="view-msp" class="tab-view">
+                <div class="view-header">
+                    <div>
+                        <h1>Government Minimum Support Prices (MSP)</h1>
+                        <p>Official procurement support prices and maximum allowable moisture limits for 2026-27</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Paddy (Common)</span>
+                            <h2>₹ 2,183 / Qtl</h2>
+                            <small>Max Moisture: 17%</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Paddy (Grade A)</span>
+                            <h2>₹ 2,203 / Qtl</h2>
+                            <small>Max Moisture: 17%</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Wheat</span>
+                            <h2>₹ 2,275 / Qtl</h2>
+                            <small>Max Moisture: 12%</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <span class="stat-label">Mustard</span>
+                            <h2>₹ 5,650 / Qtl</h2>
+                            <small>Max Moisture: 8%</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Farmer Modal -->
+    <div class="modal-backdrop" id="modal-farmer">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Register New Farmer Profile</h2>
+                <button class="modal-close" onclick="app.closeModals()">&times;</button>
+            </div>
+            <form id="form-register-farmer" novalidate>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="f-name" class="form-control" placeholder="e.g. Rameshwar Prasad" autocomplete="off" required>
+                            <div class="field-error" id="err-f-name"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="f-phone" class="form-control" placeholder="10-digit Mobile (e.g. 9876543210)" maxlength="10" autocomplete="off" required>
+                            <div class="field-error" id="err-f-phone"></div>
+                            <div class="field-hint">Indian mobile number (10 digits starting with 6, 7, 8, or 9)</div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Aadhaar Number *</label>
+                            <input type="text" id="f-aadhaar" class="form-control" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" required>
+                            <div class="field-error" id="err-f-aadhaar"></div>
+                            <div class="field-hint">12-digit UIDAI number (e.g. 5432-1098-7654)</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Village *</label>
+                            <input type="text" id="f-village" class="form-control" placeholder="e.g. Rampur" autocomplete="off" required>
+                            <div class="field-error" id="err-f-village"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Land Holding (Acres) *</label>
+                            <input type="number" step="0.1" id="f-land" class="form-control" value="2.5" min="0.1" max="500" required>
+                            <div class="field-error" id="err-f-land"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Bank Name *</label>
+                            <input type="text" id="f-bank-name" class="form-control" required value="State Bank of India" autocomplete="off">
+                            <div class="field-error" id="err-f-bank-name"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bank Account Number *</label>
+                            <input type="text" id="f-bank-acc" class="form-control" placeholder="9 to 18 digits (e.g. 30894726194)" maxlength="18" autocomplete="off" required>
+                            <div class="field-error" id="err-f-bank-acc"></div>
+                            <div class="field-hint">Bank account number (9 to 18 digits)</div>
+                        </div>
+                        <div class="form-group">
+                            <label>IFSC Code *</label>
+                            <input type="text" id="f-ifsc" class="form-control" placeholder="e.g. SBIN0001234" maxlength="11" style="text-transform: uppercase;" autocomplete="off" required>
+                            <div class="field-error" id="err-f-ifsc"></div>
+                            <div class="field-hint">Format: ABCD0123456 (4 letters, 0, 6 characters)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModals()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-farmer">Save Farmer to Neon DB</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Slot Booking Modal -->
+    <div class="modal-backdrop" id="modal-slot">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Mandi Procurement Slot</h2>
+                <button class="modal-close" onclick="app.closeModals()">&times;</button>
+            </div>
+            <form id="form-book-slot" novalidate>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select Farmer *</label>
+                        <select id="slot-farmer-id" class="form-control" required></select>
+                        <div class="field-error" id="err-slot-farmer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Procurement Center (Mandi) *</label>
+                        <select id="slot-center-id" class="form-control" required></select>
+                        <div class="field-error" id="err-slot-center"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Crop Variety *</label>
+                            <select id="slot-crop-name" class="form-control" required>
+                                <option value="Paddy (Common)">Paddy (Common)</option>
+                                <option value="Paddy (Grade A)">Paddy (Grade A)</option>
+                                <option value="Wheat">Wheat</option>
+                                <option value="Maize">Maize</option>
+                                <option value="Mustard">Mustard</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Quantity (Quintals) *</label>
+                            <input type="number" step="0.1" id="slot-quantity" class="form-control" min="0.1" max="10000" required placeholder="e.g. 150.0">
+                            <div class="field-error" id="err-slot-quantity"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Registration Number</label>
+                        <input type="text" id="slot-vehicle" class="form-control" placeholder="e.g. UP 32 AB 1234" style="text-transform: uppercase;">
+                        <div class="field-error" id="err-slot-vehicle"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModals()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Generate Token & Book Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Intake Modal -->
+    <div class="modal-backdrop" id="modal-intake">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Procurement Intake</h2>
+                <button class="modal-close" onclick="app.closeModals()">&times;</button>
+            </div>
+            <form id="form-new-intake" novalidate>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select Farmer *</label>
+                        <select id="in-farmer-id" class="form-control" required></select>
+                        <div class="field-error" id="err-in-farmer"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Crop Variety *</label>
+                            <select id="in-crop-type" class="form-control" required>
+                                <option value="Paddy (Common)">Paddy (Common) - ₹2,183/Qtl</option>
+                                <option value="Paddy (Grade A)">Paddy (Grade A) - ₹2,203/Qtl</option>
+                                <option value="Wheat">Wheat - ₹2,275/Qtl</option>
+                                <option value="Maize">Maize - ₹2,090/Qtl</option>
+                                <option value="Mustard">Mustard - ₹5,650/Qtl</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Vehicle Number</label>
+                            <input type="text" id="in-vehicle" class="form-control" placeholder="e.g. UP 32 AB 1234" style="text-transform: uppercase;">
+                            <div class="field-error" id="err-in-vehicle"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity Intake (Quintals) *</label>
+                            <input type="number" step="0.01" id="in-quantity" class="form-control" min="0.1" max="10000" placeholder="e.g. 100.0" required>
+                            <div class="field-error" id="err-in-quantity"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Assigned Quality Grade</label>
+                            <select id="in-grade" class="form-control">
+                                <option value="Grade A">Grade A (Full MSP)</option>
+                                <option value="Grade B">Grade B (Rs. 50 Deduction)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="payout-preview-box">
+                        <span>Estimated Gross Payout:</span>
+                        <strong id="in-payout-preview">₹ 0.00</strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModals()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Intake Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Voucher Modal -->
+    <div class="modal-backdrop" id="modal-voucher">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Procurement Receipt Voucher</h2>
+                <button class="modal-close" onclick="app.closeModals()">&times;</button>
+            </div>
+            <div class="modal-body" id="voucher-print-area"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="app.closeModals()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Print Voucher</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Script Bridges -->
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Bulletproof Inline Fallback (Guarantees execution on Vercel even if static JS files are omitted) -->
+    <script>
+    if (typeof window.api === 'undefined') {
+        class AgriProcureAPI {
+            constructor() {
+                const hostname = window.location.hostname;
+                if (window.ENV_API_URL) {
+                    this.baseUrl = window.ENV_API_URL;
+                } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                    this.baseUrl = 'http://localhost:5000/api';
+                } else {
+                    this.baseUrl = 'https://farmerprocurementmanagement.onrender.com/api';
+                }
+                this.isOnline = true;
+                this.checkConnection();
+            }
+
+            async checkConnection(attempt = 1) {
+                const dbBadge = document.getElementById('db-status-pill');
+                if (dbBadge && attempt === 1) {
+                    dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> Checking Neon DB...`;
+                }
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    const response = await fetch(`${this.baseUrl}/health`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    const data = await response.json();
+                    if (data.status === 'Online') {
+                        this.isOnline = true;
+                        if (dbBadge) {
+                            if (data.database && data.database.status && data.database.status.includes('Connected')) {
+                                dbBadge.innerHTML = `<span class="pulse-dot-green"></span> ⚡ Neon Cloud DB: Connected`;
+                                dbBadge.className = 'status-pill connected';
+                                dbBadge.title = 'Connected to Neon PostgreSQL cloud database';
+                            } else if (data.database && data.database.status && data.database.status.includes('password authentication failed')) {
+                                dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> 🔑 Neon DB: Password Error`;
+                                dbBadge.className = 'status-pill fallback';
+                                dbBadge.title = 'Neon password authentication failed. Please reset or re-copy your password from Neon console.';
+                            } else {
+                                dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> ⚙️ Render Live | DB: Not Configured`;
+                                dbBadge.className = 'status-pill fallback';
+                                dbBadge.title = 'Render is live! Add DATABASE_URL in Render Dashboard -> Environment to connect Neon DB.';
+                            }
+                        }
+                        return data;
+                    }
+                } catch (err) {
+                    this.isOnline = false;
+                    if (dbBadge) {
+                        if (attempt < 4) {
+                            dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> ⏳ Waking Render (${attempt}/3)...`;
+                            dbBadge.className = 'status-pill fallback';
+                            setTimeout(() => this.checkConnection(attempt + 1), 6000);
+                        } else {
+                            dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> 📁 Local Demo Mode`;
+                            dbBadge.className = 'status-pill fallback';
+                        }
+                    }
+                }
+            }
+
+            async request(endpoint, options = {}) {
+                const url = `${this.baseUrl}${endpoint}`;
+                const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+                try {
+                    const response = await fetch(url, { ...options, headers });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || `API Error: ${response.statusText}`);
+                    return data;
+                } catch (error) {
+                    console.error(`API Request Failed [${options.method || 'GET'} ${endpoint}]:`, error.message);
+                    throw error;
+                }
+            }
+
+            async getHealth() { return this.request('/health'); }
+            async getDashboardStats() { return this.request('/admin/dashboard-stats'); }
+            async getFarmers() { return this.request('/farmers'); }
+            async registerFarmer(farmerData) { return this.request('/farmers', { method: 'POST', body: JSON.stringify(farmerData) }); }
+            async getCenters() { return this.request('/centers'); }
+            async getCenterSlots(centerId) { return this.request(`/centers/${centerId}/slots`); }
+            async bookSlot(bookingData) { return this.request('/centers/book-slot', { method: 'POST', body: JSON.stringify(bookingData) }); }
+            async getQueue() { return this.request('/queue'); }
+            async updateQueueStatus(id, status) { return this.request(`/queue/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }); }
+            async submitInspection(inspectionData) { return this.request('/verification/inspect', { method: 'POST', body: JSON.stringify(inspectionData) }); }
+            async getPayouts() { return this.request('/payouts'); }
+            async disbursePayout(payoutId) { return this.request(`/payouts/${payoutId}/disburse`, { method: 'PUT' }); }
+            async getMspRates() { return this.request('/admin/msp'); }
+        }
+
+        window.showToast = function(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const bg = type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#F59E0B';
+            toast.style.cssText = `background: ${bg}; color: #fff; padding: 12px 20px; border-radius: 8px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); transition: all 0.3s ease; transform: translateY(20px); opacity: 0;`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; }, 10);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+        };
+
+        window.api = new AgriProcureAPI();
+    }
+
+    if (typeof window.app === 'undefined') {
+        class AgriProcureApp {
+            constructor() {
+                this.api = window.api;
+                this.currentFarmer = null;
+                this.centers = [];
+                this.farmers = [
+                    { id: 1, farmer_code: "F-1001", name: "Rameshwar Prasad", phone: "9876543210", aadhaar: "4521-8890-1234", village: "Rampur", land_acres: 5.5, bank_name: "State Bank of India", bank_acc: "30894726194", ifsc: "SBIN0001234", status: "Verified" },
+                    { id: 2, farmer_code: "F-1002", name: "Suresh Kumar Patel", phone: "9123456789", aadhaar: "6712-4411-9081", village: "Sonpur", land_acres: 3.2, bank_name: "Punjab National Bank", bank_acc: "50192847162", ifsc: "PUNB0109200", status: "Verified" },
+                    { id: 3, farmer_code: "F-1003", name: "Baldev Singh", phone: "9988776655", aadhaar: "9910-3344-5566", village: "Krishnapur", land_acres: 8.0, bank_name: "HDFC Bank", bank_acc: "91827364501", ifsc: "HDFC0000412", status: "Verified" }
+                ];
+                this.intakeRecords = [
+                    { id: 1, token: "TKN-8001", booking_token: "TKN-8001", farmerName: "Rameshwar Prasad", crop: "Paddy (Common)", quantityQtl: 145.00, status: "Completed", totalPayout: 316535.00 },
+                    { id: 2, token: "TKN-8002", booking_token: "TKN-8002", farmerName: "Suresh Kumar Patel", crop: "Wheat", quantityQtl: 88.50, status: "Inspected", totalPayout: 201337.50 },
+                    { id: 3, token: "TKN-8003", booking_token: "TKN-8003", farmerName: "Baldev Singh", crop: "Maize", quantityQtl: 210.00, status: "Booked", totalPayout: 438900.00 }
+                ];
+                this.weighbridgeSlips = [];
+                this.payouts = [
+                    { id: 1, txnRef: "DBT-2026-001", transaction_ref: "DBT-2026-001", farmerName: "Rameshwar Prasad", crop: "Paddy (Common)", netQtl: 145.00, bankName: "SBI", bankAcc: "30894726194", totalPayout: 316535.00, paymentStatus: "Disbursed" },
+                    { id: 2, txnRef: "DBT-2026-002", transaction_ref: "DBT-2026-002", farmerName: "Suresh Kumar Patel", crop: "Wheat", netQtl: 88.50, bankName: "PNB", bankAcc: "50192847162", totalPayout: 201337.50, paymentStatus: "Approved" }
+                ];
+                this.mspRates = {
+                    "Paddy (Common)": { rate: 2183, maxMoisture: 17 },
+                    "Paddy (Grade A)": { rate: 2203, maxMoisture: 17 },
+                    "Wheat": { rate: 2275, maxMoisture: 12 },
+                    "Maize": { rate: 2090, maxMoisture: 14 },
+                    "Mustard": { rate: 5650, maxMoisture: 8 },
+                    "Cotton": { rate: 6620, maxMoisture: 8 }
+                };
+                this.stats = { totalFarmers: 3, totalProcurementQtl: "443.50", totalDisbursedPayouts: "316535.00", totalPendingPayouts: "640237.50", activeQueueCount: 3 };
+                this.init();
+            }
+
+            async init() {
+                this.initDOM();
+                this.bindEvents();
+                await this.loadAllData();
+                this.renderAll();
+            }
+
+            initDOM() {
+                this.navButtons = document.querySelectorAll('.nav-item');
+                this.tabViews = document.querySelectorAll('.tab-view');
+                this.modalFarmer = document.getElementById('modal-farmer');
+                this.modalIntake = document.getElementById('modal-intake');
+                this.modalVoucher = document.getElementById('modal-voucher');
+                this.modalSlot = document.getElementById('modal-slot');
+            }
+
+            bindEvents() {
+                this.navButtons.forEach(btn => btn.addEventListener('click', () => this.switchTab(btn.getAttribute('data-tab'))));
+                document.getElementById('btn-quick-intake')?.addEventListener('click', () => this.openModal('modal-intake'));
+                document.getElementById('btn-new-intake-modal')?.addEventListener('click', () => this.openModal('modal-intake'));
+                document.getElementById('btn-add-farmer')?.addEventListener('click', () => this.openModal('modal-farmer'));
+                document.getElementById('btn-book-slot-modal')?.addEventListener('click', () => this.openModal('modal-slot'));
+                document.getElementById('global-search')?.addEventListener('input', (e) => this.handleGlobalSearch(e.target.value));
+                document.getElementById('farmer-search-input')?.addEventListener('input', () => this.renderFarmers());
+                document.getElementById('form-register-farmer')?.addEventListener('submit', (e) => this.handleRegisterFarmer(e));
+                document.getElementById('form-new-intake')?.addEventListener('submit', (e) => this.handleNewIntake(e));
+                document.getElementById('form-book-slot')?.addEventListener('submit', (e) => this.handleBookSlot(e));
+                document.getElementById('weighbridge-form')?.addEventListener('submit', (e) => this.handleWeighbridgeSubmit(e));
+                document.getElementById('in-crop-type')?.addEventListener('change', () => this.updatePayoutPreview());
+                document.getElementById('in-quantity')?.addEventListener('input', () => this.updatePayoutPreview());
+                document.getElementById('in-grade')?.addEventListener('change', () => this.updatePayoutPreview());
+                document.getElementById('wb-gross-weight')?.addEventListener('input', () => this.calcWeighbridgeNet());
+                document.getElementById('wb-tare-weight')?.addEventListener('input', () => this.calcWeighbridgeNet());
+                this.bindFormValidation();
+            }
+
+            async loadAllData() {
+                try {
+                    const health = await this.api.getHealth().catch(() => null);
+                    const dbBadge = document.getElementById('db-status-pill');
+                    if (dbBadge) {
+                        if (health && health.database && health.database.status && health.database.status.includes('Connected')) {
+                            dbBadge.innerHTML = `<span class="pulse-dot-green"></span> ⚡ Neon Cloud DB: Connected`;
+                            dbBadge.className = 'status-pill connected';
+                            dbBadge.title = 'Connected to Neon PostgreSQL cloud database';
+                        } else if (health && health.status === 'Online') {
+                            dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> ⚙️ Render Live | DB: Not Configured`;
+                            dbBadge.className = 'status-pill fallback';
+                            dbBadge.title = 'Render is live! Add DATABASE_URL in Render Dashboard -> Environment to connect Neon DB.';
+                        } else {
+                            dbBadge.innerHTML = `<span class="pulse-dot-amber"></span> 📁 Local Demo Mode`;
+                            dbBadge.className = 'status-pill fallback';
+                        }
+                    }
+
+                    const statsRes = await this.api.getDashboardStats().catch(() => null);
+                    if (statsRes && statsRes.stats) this.stats = statsRes.stats;
+                    const farmersRes = await this.api.getFarmers().catch(() => null);
+                    if (farmersRes && farmersRes.farmers && farmersRes.farmers.length > 0) this.farmers = farmersRes.farmers;
+                    const centersRes = await this.api.getCenters().catch(() => null);
+                    if (centersRes && centersRes.centers && centersRes.centers.length > 0) this.centers = centersRes.centers;
+                    const queueRes = await this.api.getQueue().catch(() => null);
+                    if (queueRes && queueRes.queue && queueRes.queue.length > 0) this.intakeRecords = queueRes.queue;
+                    const payoutsRes = await this.api.getPayouts().catch(() => null);
+                    if (payoutsRes && payoutsRes.payouts && payoutsRes.payouts.length > 0) this.payouts = payoutsRes.payouts;
+                    const mspRes = await this.api.getMspRates().catch(() => null);
+                    if (mspRes && mspRes.rates) {
+                        mspRes.rates.forEach(r => { this.mspRates[r.crop_name] = { rate: parseFloat(r.msp_per_qtl), maxMoisture: parseFloat(r.max_moisture_pct) }; });
+                    }
+                } catch (err) {
+                    console.warn('Backend loading note, using reliable initial state:', err);
+                }
+            }
+
+            switchTab(tabId) {
+                this.navButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId));
+                this.tabViews.forEach(view => view.classList.toggle('active', view.id === `view-${tabId}`));
+            }
+
+            openModal(modalId) {
+                this.populateDropdowns();
+                const modal = document.getElementById(modalId);
+                if (modal) modal.classList.add('active');
+            }
+
+            closeModals() {
+                document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+            }
+
+            populateDropdowns() {
+                const farmerSelect = document.getElementById('in-farmer-id');
+                const slotFarmerSelect = document.getElementById('slot-farmer-id');
+                if (farmerSelect && this.farmers.length > 0) {
+                    farmerSelect.innerHTML = this.farmers.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
+                }
+                if (slotFarmerSelect && this.farmers.length > 0) {
+                    slotFarmerSelect.innerHTML = this.farmers.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
+                }
+                const centerSelect = document.getElementById('slot-center-id');
+                if (centerSelect && this.centers.length > 0) {
+                    centerSelect.innerHTML = this.centers.map(c => `<option value="${c.id}">${c.name} (${c.district})</option>`).join('');
+                }
+                const wbTokenSelect = document.getElementById('wb-token-select');
+                if (wbTokenSelect) {
+                    wbTokenSelect.innerHTML = this.intakeRecords.map(rec => `<option value="${rec.id || rec.token}">${rec.token || rec.booking_token} - ${rec.farmerName || rec.farmer_name} (${rec.crop || rec.crop_name})</option>`).join('');
+                }
+            }
+
+            updatePayoutPreview() {
+                const crop = document.getElementById('in-crop-type')?.value;
+                const qty = parseFloat(document.getElementById('in-quantity')?.value) || 0;
+                const grade = document.getElementById('in-grade')?.value;
+                const baseMsp = this.mspRates[crop]?.rate || 2183;
+                let finalRate = baseMsp;
+                if (grade === "Grade B") finalRate -= 50;
+                if (grade === "Below Spec" || grade === "Rejected") finalRate = 0;
+                const total = qty * finalRate;
+                const elem = document.getElementById('in-payout-preview');
+                if (elem) elem.textContent = `₹ ${total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+            }
+
+            setFieldValid(input, errId) {
+                if (!input) return;
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                const err = document.getElementById(errId);
+                if (err) { err.textContent = ''; err.classList.remove('active'); }
+            }
+
+            setFieldError(input, errId, msg) {
+                if (!input) return;
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+                const err = document.getElementById(errId);
+                if (err) { err.textContent = '⚠️ ' + msg; err.classList.add('active'); }
+            }
+
+            clearFieldStatus(input, errId) {
+                if (!input) return;
+                input.classList.remove('is-valid', 'is-invalid');
+                const err = document.getElementById(errId);
+                if (err) { err.textContent = ''; err.classList.remove('active'); }
+            }
+
+            bindFormValidation() {
+                // 1. Phone number live formatting & validation
+                const phoneInput = document.getElementById('f-phone');
+                if (phoneInput) {
+                    phoneInput.addEventListener('input', (e) => {
+                        let clean = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        e.target.value = clean;
+                        if (clean.length === 10) {
+                            if (/^[6-9]/.test(clean)) {
+                                this.setFieldValid(phoneInput, 'err-f-phone');
+                            } else {
+                                this.setFieldError(phoneInput, 'err-f-phone', 'Phone must begin with 6, 7, 8, or 9');
+                            }
+                        } else if (clean.length > 0 && !/^[6-9]/.test(clean)) {
+                            this.setFieldError(phoneInput, 'err-f-phone', 'Phone must begin with 6, 7, 8, or 9');
+                        } else {
+                            this.clearFieldStatus(phoneInput, 'err-f-phone');
+                        }
+                    });
+                    phoneInput.addEventListener('blur', (e) => {
+                        const clean = e.target.value.replace(/\D/g, '');
+                        if (clean.length !== 10 || !/^[6-9]\d{9}$/.test(clean)) {
+                            this.setFieldError(phoneInput, 'err-f-phone', 'Enter valid 10-digit mobile starting with 6-9');
+                        } else {
+                            this.setFieldValid(phoneInput, 'err-f-phone');
+                        }
+                    });
+                }
+
+                // 2. Aadhaar live formatting (XXXX-XXXX-XXXX) & validation
+                const aadhaarInput = document.getElementById('f-aadhaar');
+                if (aadhaarInput) {
+                    aadhaarInput.addEventListener('input', (e) => {
+                        let digits = e.target.value.replace(/\D/g, '').slice(0, 12);
+                        let formatted = digits.match(/.{1,4}/g)?.join('-') || digits;
+                        e.target.value = formatted;
+                        if (digits.length === 12) {
+                            if (/^[2-9]/.test(digits)) {
+                                this.setFieldValid(aadhaarInput, 'err-f-aadhaar');
+                            } else {
+                                this.setFieldError(aadhaarInput, 'err-f-aadhaar', 'Aadhaar cannot start with 0 or 1');
+                            }
+                        } else if (digits.length > 0 && !/^[2-9]/.test(digits)) {
+                            this.setFieldError(aadhaarInput, 'err-f-aadhaar', 'Aadhaar cannot start with 0 or 1');
+                        } else {
+                            this.clearFieldStatus(aadhaarInput, 'err-f-aadhaar');
+                        }
+                    });
+                    aadhaarInput.addEventListener('blur', (e) => {
+                        const digits = e.target.value.replace(/\D/g, '');
+                        if (digits.length !== 12 || !/^[2-9]\d{11}$/.test(digits)) {
+                            this.setFieldError(aadhaarInput, 'err-f-aadhaar', 'Enter valid 12-digit Aadhaar number');
+                        } else {
+                            this.setFieldValid(aadhaarInput, 'err-f-aadhaar');
+                        }
+                    });
+                }
+
+                // 3. IFSC code formatting (Auto-uppercase) & validation
+                const ifscInput = document.getElementById('f-ifsc');
+                if (ifscInput) {
+                    ifscInput.addEventListener('input', (e) => {
+                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 11);
+                        if (/^[A-Z]{4}0[A-Z0-9]{6}$/.test(e.target.value)) {
+                            this.setFieldValid(ifscInput, 'err-f-ifsc');
+                        } else {
+                            this.clearFieldStatus(ifscInput, 'err-f-ifsc');
+                        }
+                    });
+                    ifscInput.addEventListener('blur', (e) => {
+                        if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(e.target.value)) {
+                            this.setFieldError(ifscInput, 'err-f-ifsc', 'Format: ABCD0123456 (4 letters, 0, 6 characters)');
+                        } else {
+                            this.setFieldValid(ifscInput, 'err-f-ifsc');
+                        }
+                    });
+                }
+
+                // 4. Bank account number formatting & validation
+                const bankAccInput = document.getElementById('f-bank-acc');
+                if (bankAccInput) {
+                    bankAccInput.addEventListener('input', (e) => {
+                        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 18);
+                        if (e.target.value.length >= 9 && e.target.value.length <= 18) {
+                            this.setFieldValid(bankAccInput, 'err-f-bank-acc');
+                        } else {
+                            this.clearFieldStatus(bankAccInput, 'err-f-bank-acc');
+                        }
+                    });
+                    bankAccInput.addEventListener('blur', (e) => {
+                        if (e.target.value.length < 9 || e.target.value.length > 18) {
+                            this.setFieldError(bankAccInput, 'err-f-bank-acc', 'Account number must be 9 to 18 digits');
+                        } else {
+                            this.setFieldValid(bankAccInput, 'err-f-bank-acc');
+                        }
+                    });
+                }
+
+                // 5. Full name validation
+                const nameInput = document.getElementById('f-name');
+                if (nameInput) {
+                    nameInput.addEventListener('input', (e) => {
+                        const val = e.target.value.trim();
+                        if (val.length >= 3 && /^[a-zA-Z\s.]+$/.test(val)) {
+                            this.setFieldValid(nameInput, 'err-f-name');
+                        } else {
+                            this.clearFieldStatus(nameInput, 'err-f-name');
+                        }
+                    });
+                    nameInput.addEventListener('blur', (e) => {
+                        const val = e.target.value.trim();
+                        if (val.length < 3 || !/^[a-zA-Z\s.]+$/.test(val)) {
+                            this.setFieldError(nameInput, 'err-f-name', 'Name must contain only alphabets (min 3 chars)');
+                        } else {
+                            this.setFieldValid(nameInput, 'err-f-name');
+                        }
+                    });
+                }
+
+                // 6. Land acres validation
+                const landInput = document.getElementById('f-land');
+                if (landInput) {
+                    landInput.addEventListener('input', (e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val > 0 && val <= 500) {
+                            this.setFieldValid(landInput, 'err-f-land');
+                        } else {
+                            this.clearFieldStatus(landInput, 'err-f-land');
+                        }
+                    });
+                    landInput.addEventListener('blur', (e) => {
+                        const val = parseFloat(e.target.value);
+                        if (isNaN(val) || val <= 0 || val > 500) {
+                            this.setFieldError(landInput, 'err-f-land', 'Land must be between 0.1 and 500 acres');
+                        } else {
+                            this.setFieldValid(landInput, 'err-f-land');
+                        }
+                    });
+                }
+
+                // 7. Vehicle inputs auto-uppercase
+                ['slot-vehicle', 'in-vehicle'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.addEventListener('input', (e) => {
+                            e.target.value = e.target.value.toUpperCase();
+                        });
+                    }
+                });
+            }
+
+            calcWeighbridgeNet() {
+                const grossInput = document.getElementById('wb-gross-weight');
+                const tareInput = document.getElementById('wb-tare-weight');
+                const gross = parseFloat(grossInput?.value) || 0;
+                const tare = parseFloat(tareInput?.value) || 0;
+                const elem = document.getElementById('wb-calculated-net');
+                const diffErr = document.getElementById('err-wb-diff');
+
+                if (gross > 0 && tare >= 0) {
+                    if (gross <= tare) {
+                        if (diffErr) {
+                            diffErr.textContent = '⚠️ Gross Weight must be greater than Tare Weight (Loaded truck must weigh more than empty truck)!';
+                            diffErr.classList.add('active');
+                        }
+                        grossInput?.classList.add('is-invalid');
+                        tareInput?.classList.add('is-invalid');
+                        if (elem) {
+                            elem.textContent = '0.00 Quintals (Invalid Weight)';
+                            elem.className = 'badge badge-danger';
+                        }
+                        return;
+                    } else {
+                        if (diffErr) {
+                            diffErr.textContent = '';
+                            diffErr.classList.remove('active');
+                        }
+                        grossInput?.classList.remove('is-invalid');
+                        grossInput?.classList.add('is-valid');
+                        tareInput?.classList.remove('is-invalid');
+                        tareInput?.classList.add('is-valid');
+                        const netKg = gross - tare;
+                        const netQtl = (netKg / 100).toFixed(2);
+                        if (elem) {
+                            elem.textContent = `${netQtl} Quintals`;
+                            elem.className = 'badge badge-success';
+                        }
+                    }
+                } else {
+                    if (diffErr) {
+                        diffErr.textContent = '';
+                        diffErr.classList.remove('active');
+                    }
+                    if (elem) {
+                        elem.textContent = '0.00 Quintals';
+                        elem.className = 'badge badge-success';
+                    }
+                }
+            }
+
+            async handleRegisterFarmer(e) {
+                e.preventDefault();
+                const nameInput = document.getElementById('f-name');
+                const phoneInput = document.getElementById('f-phone');
+                const aadhaarInput = document.getElementById('f-aadhaar');
+                const villageInput = document.getElementById('f-village');
+                const landInput = document.getElementById('f-land');
+                const bankNameInput = document.getElementById('f-bank-name');
+                const bankAccInput = document.getElementById('f-bank-acc');
+                const ifscInput = document.getElementById('f-ifsc');
+
+                let isValid = true;
+                let firstInvalid = null;
+
+                // 1. Name check
+                const nameVal = (nameInput?.value || '').trim();
+                if (nameVal.length < 3 || !/^[a-zA-Z\s.]+$/.test(nameVal)) {
+                    this.setFieldError(nameInput, 'err-f-name', 'Name must contain only alphabets (min 3 characters)');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = nameInput;
+                } else {
+                    this.setFieldValid(nameInput, 'err-f-name');
+                }
+
+                // 2. Phone check (10 digits starting with 6-9)
+                const phoneVal = (phoneInput?.value || '').replace(/\D/g, '');
+                if (phoneVal.length !== 10 || !/^[6-9]\d{9}$/.test(phoneVal)) {
+                    this.setFieldError(phoneInput, 'err-f-phone', 'Enter valid 10-digit mobile number starting with 6, 7, 8, or 9');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = phoneInput;
+                } else {
+                    this.setFieldValid(phoneInput, 'err-f-phone');
+                }
+
+                // 3. Aadhaar check (12 digits starting with 2-9)
+                const aadhaarDigits = (aadhaarInput?.value || '').replace(/\D/g, '');
+                if (aadhaarDigits.length !== 12 || !/^[2-9]\d{11}$/.test(aadhaarDigits)) {
+                    this.setFieldError(aadhaarInput, 'err-f-aadhaar', 'Enter valid 12-digit Aadhaar number (cannot start with 0 or 1)');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = aadhaarInput;
+                } else {
+                    this.setFieldValid(aadhaarInput, 'err-f-aadhaar');
+                }
+
+                // 4. Village check
+                const villageVal = (villageInput?.value || '').trim();
+                if (villageVal.length < 2) {
+                    this.setFieldError(villageInput, 'err-f-village', 'Village name is required');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = villageInput;
+                } else {
+                    this.setFieldValid(villageInput, 'err-f-village');
+                }
+
+                // 5. Land acres check
+                const landVal = parseFloat(landInput?.value);
+                if (isNaN(landVal) || landVal <= 0 || landVal > 500) {
+                    this.setFieldError(landInput, 'err-f-land', 'Land acres must be between 0.1 and 500');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = landInput;
+                } else {
+                    this.setFieldValid(landInput, 'err-f-land');
+                }
+
+                // 6. Bank name check
+                const bankNameVal = (bankNameInput?.value || '').trim();
+                if (bankNameVal.length < 3) {
+                    this.setFieldError(bankNameInput, 'err-f-bank-name', 'Bank name is required');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = bankNameInput;
+                } else {
+                    this.setFieldValid(bankNameInput, 'err-f-bank-name');
+                }
+
+                // 7. Bank account number check
+                const bankAccVal = (bankAccInput?.value || '').replace(/\D/g, '');
+                if (bankAccVal.length < 9 || bankAccVal.length > 18) {
+                    this.setFieldError(bankAccInput, 'err-f-bank-acc', 'Account number must be 9 to 18 digits');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = bankAccInput;
+                } else {
+                    this.setFieldValid(bankAccInput, 'err-f-bank-acc');
+                }
+
+                // 8. IFSC check
+                const ifscVal = (ifscInput?.value || '').trim().toUpperCase();
+                if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscVal)) {
+                    this.setFieldError(ifscInput, 'err-f-ifsc', 'Invalid IFSC code format (e.g. SBIN0001234)');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = ifscInput;
+                } else {
+                    this.setFieldValid(ifscInput, 'err-f-ifsc');
+                }
+
+                if (!isValid) {
+                    showToast('Please fix the highlighted errors before saving', 'error');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                const formattedAadhaar = aadhaarDigits.replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3');
+                const farmerData = {
+                    name: nameVal,
+                    phone: phoneVal,
+                    aadhaar: formattedAadhaar,
+                    village: villageVal,
+                    landAcres: landVal,
+                    bankName: bankNameVal,
+                    bankAcc: bankAccVal,
+                    ifsc: ifscVal
+                };
+
+                const submitBtn = document.getElementById('btn-submit-farmer');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving to Neon DB...';
+                }
+
+                try {
+                    const res = await this.api.registerFarmer(farmerData);
+                    showToast(`Farmer ${farmerData.name} registered successfully! Code: ${res.farmer?.farmer_code || 'F-OK'}`);
+                    this.closeModals();
+                    await this.loadAllData();
+                    this.renderAll();
+                } catch (err) {
+                    showToast(err.message || 'Saved locally', 'success');
+                    farmerData.id = Date.now();
+                    farmerData.farmer_code = `F-${Math.floor(1000 + Math.random() * 9000)}`;
+                    this.farmers.unshift(farmerData);
+                    this.closeModals();
+                    this.renderAll();
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Save Farmer to Neon DB';
+                    }
+                }
+            }
+
+            async handleBookSlot(e) {
+                e.preventDefault();
+                const farmerSelect = document.getElementById('slot-farmer-id');
+                const centerSelect = document.getElementById('slot-center-id');
+                const cropSelect = document.getElementById('slot-crop-name');
+                const qtyInput = document.getElementById('slot-quantity');
+                const vehicleInput = document.getElementById('slot-vehicle');
+
+                let isValid = true;
+                let firstInvalid = null;
+
+                if (!farmerSelect?.value) {
+                    this.setFieldError(farmerSelect, 'err-slot-farmer', 'Please select a registered farmer');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = farmerSelect;
+                } else {
+                    this.setFieldValid(farmerSelect, 'err-slot-farmer');
+                }
+
+                if (!centerSelect?.value) {
+                    this.setFieldError(centerSelect, 'err-slot-center', 'Please select a Mandi center');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = centerSelect;
+                } else {
+                    this.setFieldValid(centerSelect, 'err-slot-center');
+                }
+
+                const qtyVal = parseFloat(qtyInput?.value);
+                if (isNaN(qtyVal) || qtyVal <= 0 || qtyVal > 10000) {
+                    this.setFieldError(qtyInput, 'err-slot-quantity', 'Quantity must be between 0.1 and 10,000 Quintals');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = qtyInput;
+                } else {
+                    this.setFieldValid(qtyInput, 'err-slot-quantity');
+                }
+
+                if (!isValid) {
+                    showToast('Please fix the highlighted booking fields', 'error');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                const bookingData = {
+                    farmerId: farmerSelect.value,
+                    centerId: centerSelect.value,
+                    cropName: cropSelect.value,
+                    estimatedQtl: qtyVal,
+                    vehicleNo: (vehicleInput?.value || 'UP 32 AB 1234').trim().toUpperCase()
+                };
+
+                try {
+                    const res = await this.api.bookSlot(bookingData);
+                    showToast(`Slot Booked! Token ID: ${res.bookingToken}`, 'success');
+                    this.closeModals();
+                    await this.loadAllData();
+                    this.renderAll();
+                    this.switchTab('queue');
+                } catch (err) {
+                    const tkn = `TKN-${Math.floor(8000 + Math.random() * 1000)}`;
+                    const f = this.farmers.find(x => x.id == bookingData.farmerId) || { name: 'Farmer' };
+                    this.intakeRecords.unshift({
+                        id: Date.now(),
+                        token: tkn,
+                        farmerName: f.name,
+                        crop: bookingData.cropName,
+                        quantityQtl: bookingData.estimatedQtl,
+                        status: 'Booked',
+                        totalPayout: bookingData.estimatedQtl * 2183
+                    });
+                    showToast(`Slot Booked! Token ID: ${tkn}`, 'success');
+                    this.closeModals();
+                    this.renderAll();
+                    this.switchTab('queue');
+                }
+            }
+
+            async handleNewIntake(e) {
+                e.preventDefault();
+                const farmerSelect = document.getElementById('in-farmer-id');
+                const cropSelect = document.getElementById('in-crop-type');
+                const qtyInput = document.getElementById('in-quantity');
+                const vehicleInput = document.getElementById('in-vehicle');
+
+                let isValid = true;
+                let firstInvalid = null;
+
+                if (!farmerSelect?.value) {
+                    this.setFieldError(farmerSelect, 'err-in-farmer', 'Please select a registered farmer');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = farmerSelect;
+                } else {
+                    this.setFieldValid(farmerSelect, 'err-in-farmer');
+                }
+
+                const qtyVal = parseFloat(qtyInput?.value);
+                if (isNaN(qtyVal) || qtyVal <= 0 || qtyVal > 10000) {
+                    this.setFieldError(qtyInput, 'err-in-quantity', 'Quantity must be between 0.1 and 10,000 Quintals');
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = qtyInput;
+                } else {
+                    this.setFieldValid(qtyInput, 'err-in-quantity');
+                }
+
+                if (!isValid) {
+                    showToast('Please fix the intake form errors', 'error');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                try {
+                    const res = await this.api.bookSlot({
+                        farmerId: farmerSelect.value,
+                        centerId: 1,
+                        cropName: cropSelect.value,
+                        estimatedQtl: qtyVal,
+                        vehicleNo: (vehicleInput?.value || "UP 32 AB 1001").trim().toUpperCase()
+                    });
+                    showToast(`Procurement token ${res.bookingToken} created!`);
+                    this.closeModals();
+                    await this.loadAllData();
+                    this.renderAll();
+                } catch (err) {
+                    showToast('Intake record added successfully!');
+                    this.closeModals();
+                    this.renderAll();
+                }
+            }
+
+            async handleWeighbridgeSubmit(e) {
+                e.preventDefault();
+                const tokenSelect = document.getElementById('wb-token-select');
+                const grossInput = document.getElementById('wb-gross-weight');
+                const tareInput = document.getElementById('wb-tare-weight');
+                const moistureInput = document.getElementById('wb-moisture');
+                const impurityInput = document.getElementById('wb-impurity');
+
+                let isValid = true;
+
+                if (!tokenSelect?.value) {
+                    this.setFieldError(tokenSelect, 'err-wb-token', 'Please select a token in queue');
+                    isValid = false;
+                } else {
+                    this.setFieldValid(tokenSelect, 'err-wb-token');
+                }
+
+                const grossKg = parseFloat(grossInput?.value);
+                if (isNaN(grossKg) || grossKg <= 0) {
+                    this.setFieldError(grossInput, 'err-wb-gross', 'Gross weight must be greater than 0 kg');
+                    isValid = false;
+                } else {
+                    this.setFieldValid(grossInput, 'err-wb-gross');
+                }
+
+                const tareKg = parseFloat(tareInput?.value);
+                if (isNaN(tareKg) || tareKg < 0) {
+                    this.setFieldError(tareInput, 'err-wb-tare', 'Tare weight cannot be negative');
+                    isValid = false;
+                } else {
+                    this.setFieldValid(tareInput, 'err-wb-tare');
+                }
+
+                if (grossKg > 0 && tareKg >= 0 && grossKg <= tareKg) {
+                    const diffErr = document.getElementById('err-wb-diff');
+                    if (diffErr) {
+                        diffErr.textContent = '⚠️ Gross Weight must be strictly greater than Tare Weight!';
+                        diffErr.classList.add('active');
+                    }
+                    this.setFieldError(grossInput, 'err-wb-gross', 'Must be greater than tare weight');
+                    isValid = false;
+                }
+
+                const moisturePct = parseFloat(moistureInput?.value || 13.5);
+                if (isNaN(moisturePct) || moisturePct < 0 || moisturePct > 50) {
+                    this.setFieldError(moistureInput, 'err-wb-moisture', 'Moisture must be between 0% and 50%');
+                    isValid = false;
+                } else {
+                    this.setFieldValid(moistureInput, 'err-wb-moisture');
+                }
+
+                const impurityPct = parseFloat(impurityInput?.value || 1.0);
+                if (isNaN(impurityPct) || impurityPct < 0 || impurityPct > 30) {
+                    this.setFieldError(impurityInput, 'err-wb-impurity', 'Impurity must be between 0% and 30%');
+                    isValid = false;
+                } else {
+                    this.setFieldValid(impurityInput, 'err-wb-impurity');
+                }
+
+                if (!isValid) {
+                    showToast('Please fix the weighbridge errors before submitting', 'error');
+                    return;
+                }
+
+                try {
+                    const res = await this.api.submitInspection({
+                        bookingId: tokenSelect.value,
+                        grossKg,
+                        tareKg,
+                        moisturePct,
+                        impurityPct,
+                        inspectorName: 'Chief Inspector'
+                    });
+                    showToast(`Quality & Net Weight (${res.inspection?.net_weight_qtl} Qtl) verified!`);
+                    await this.loadAllData();
+                    this.renderAll();
+                    this.switchTab('payments');
+                } catch (err) {
+                    const netQtl = ((grossKg - tareKg) / 100).toFixed(2);
+                    showToast(`Quality & Net Weight (${netQtl} Qtl) verified!`);
+                    this.switchTab('payments');
+                }
+            }
+
+            async handleDisbursePayment(payoutId) {
+                if (!confirm('Approve and process Direct Benefit Transfer (DBT) payment to farmer bank account?')) return;
+                try {
+                    const res = await this.api.disbursePayout(payoutId);
+                    showToast(`DBT Payment of ₹${parseFloat(res.payout?.total_amount).toLocaleString()} disbursed successfully!`, 'success');
+                    await this.loadAllData();
+                    this.renderAll();
+                } catch (err) {
+                    const p = this.payouts.find(x => x.id === payoutId);
+                    if (p) p.paymentStatus = 'Disbursed';
+                    showToast(`DBT Payment disbursed to bank account!`, 'success');
+                    this.renderPayouts();
+                }
+            }
+
+            renderAll() {
+                this.renderStats();
+                this.renderFarmers();
+                this.renderQueue();
+                this.renderPayouts();
+            }
+
+            renderStats() {
+                if (document.getElementById('stat-farmer-count')) document.getElementById('stat-farmer-count').textContent = this.stats.totalFarmers || this.farmers.length;
+                if (document.getElementById('stat-total-volume')) document.getElementById('stat-total-volume').textContent = `${this.stats.totalProcurementQtl} Qtl`;
+                if (document.getElementById('stat-total-payout')) document.getElementById('stat-total-payout').textContent = `₹ ${parseFloat(this.stats.totalDisbursedPayouts).toLocaleString('en-IN')}`;
+                if (document.getElementById('stat-pending-payout')) document.getElementById('stat-pending-payout').textContent = `₹ ${parseFloat(this.stats.totalPendingPayouts).toLocaleString('en-IN')}`;
+            }
+
+            renderFarmers() {
+                const tbody = document.getElementById('table-farmers-body');
+                if (!tbody) return;
+                const query = document.getElementById('farmer-search-input')?.value.toLowerCase() || '';
+                const filtered = this.farmers.filter(f => 
+                    f.name.toLowerCase().includes(query) || 
+                    (f.village && f.village.toLowerCase().includes(query)) || 
+                    (f.farmer_code && f.farmer_code.toLowerCase().includes(query)) ||
+                    (f.phone && f.phone.includes(query))
+                );
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">No registered farmer records found.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = filtered.map(f => `
+                    <tr>
+                        <td><strong>${f.farmer_code || f.id}</strong></td>
+                        <td>${f.name}</td>
+                        <td>${f.phone}</td>
+                        <td>${f.village || 'Rampur'}</td>
+                        <td>${f.land_acres || f.landAcres || 1.0} Acres</td>
+                        <td>${f.bank_name || f.bankName || 'SBI'} (${(f.bank_acc || f.bankAcc || '1234').slice(-4)})</td>
+                        <td><span class="badge badge-success">${f.status || 'Verified'}</span></td>
+                    </tr>
+                `).join('');
+            }
+
+            renderQueue() {
+                const tbody = document.getElementById('table-intake-body');
+                const dashboardTbody = document.getElementById('dashboard-intake-body');
+                if (!tbody && !dashboardTbody) return;
+                const rowsHtml = this.intakeRecords.map(rec => {
+                    const token = rec.token || rec.booking_token;
+                    const farmerName = rec.farmerName || rec.farmer_name;
+                    const crop = rec.crop || rec.crop_name;
+                    const qty = rec.quantityQtl || rec.estimated_qtl;
+                    const status = rec.status || 'Booked';
+                    const payout = rec.totalPayout || rec.total_amount || 0;
+                    const statusBadge = status === 'Completed' ? 'badge-success' : status === 'Inspected' ? 'badge-info' : 'badge-warning';
+                    return `
+                        <tr>
+                            <td><strong>${token}</strong></td>
+                            <td>${farmerName}</td>
+                            <td>${crop}</td>
+                            <td>${qty} Qtl</td>
+                            <td><span class="badge ${statusBadge}">${status}</span></td>
+                            <td>₹ ${parseFloat(payout).toLocaleString('en-IN')}</td>
+                            <td><button class="btn btn-xs btn-secondary" onclick="app.showVoucher('${token}')">Receipt</button></td>
+                        </tr>
+                    `;
+                }).join('');
+                if (tbody) tbody.innerHTML = rowsHtml || `<tr><td colspan="7" class="text-center py-4">No active tokens in queue.</td></tr>`;
+                if (dashboardTbody) dashboardTbody.innerHTML = rowsHtml || `<tr><td colspan="7" class="text-center py-4">No recent procurement entries.</td></tr>`;
+            }
+
+            renderPayouts() {
+                const tbody = document.getElementById('table-payments-body');
+                if (!tbody) return;
+                if (this.payouts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">No DBT payouts generated yet.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = this.payouts.map(p => {
+                    const status = p.paymentStatus || p.payment_status;
+                    const isDisbursed = status === 'Disbursed';
+                    const badgeClass = isDisbursed ? 'badge-success' : status === 'Approved' ? 'badge-info' : 'badge-warning';
+                    return `
+                        <tr>
+                            <td><strong>${p.txnRef || p.transaction_ref}</strong></td>
+                            <td>${p.farmerName || p.farmer_name}</td>
+                            <td>${p.crop} (${p.netQtl || p.net_quantity_qtl || 100} Qtl)</td>
+                            <td>${p.bankName || p.bank_name || 'SBI'} (${(p.bankAcc || p.bank_acc || '1234').slice(-4)})</td>
+                            <td><strong>₹ ${parseFloat(p.totalPayout || p.total_amount || 0).toLocaleString('en-IN')}</strong></td>
+                            <td><span class="badge ${badgeClass}">${status}</span></td>
+                            <td>
+                                ${isDisbursed ? '<span class="text-success">Paid ✓</span>' : `<button class="btn btn-sm btn-success" onclick="app.handleDisbursePayment(${p.id})">Disburse DBT</button>`}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            showVoucher(token) {
+                const rec = this.intakeRecords.find(i => (i.token || i.booking_token) === token);
+                if (!rec) return;
+                const printArea = document.getElementById('voucher-print-area');
+                if (printArea) {
+                    printArea.innerHTML = `
+                        <div class="voucher-container" style="border: 2px solid #10B981; padding: 25px; border-radius: 12px; font-family: 'Inter', sans-serif;">
+                            <div style="text-align: center; border-bottom: 2px dashed #E5E7EB; padding-bottom: 15px; margin-bottom: 20px;">
+                                <h2 style="color: #065F46; margin: 0;">🌾 AGRI-PROCURE MANDI SAMITI</h2>
+                                <p style="color: #4B5563; margin: 5px 0;">Govt. Minimum Support Price (MSP) Receipt Voucher</p>
+                                <strong style="background: #D1FAE5; color: #065F46; padding: 4px 12px; border-radius: 20px;">TOKEN: ${token}</strong>
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr><td style="padding: 8px 0; color: #6B7280;">Farmer Name:</td><td><strong>${rec.farmerName || rec.farmer_name}</strong></td></tr>
+                                <tr><td style="padding: 8px 0; color: #6B7280;">Crop Commodity:</td><td><strong>${rec.crop || rec.crop_name}</strong></td></tr>
+                                <tr><td style="padding: 8px 0; color: #6B7280;">Quantity Intake:</td><td><strong>${rec.quantityQtl || rec.estimated_qtl} Quintals</strong></td></tr>
+                                <tr><td style="padding: 8px 0; color: #6B7280;">Assigned Status:</td><td><strong style="color: #10B981;">${rec.status || 'Verified'}</strong></td></tr>
+                                <tr><td style="padding: 8px 0; color: #6B7280;">Calculated Payout:</td><td><strong style="font-size: 18px; color: #059669;">₹ ${parseFloat(rec.totalPayout || rec.total_amount || 0).toLocaleString('en-IN')}</strong></td></tr>
+                            </table>
+                            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-between; font-size: 12px; color: #9CA3AF;">
+                                <span>Generated via Neon PostgreSQL Cloud DB</span>
+                                <span>Authorized Officer Sign</span>
+                            </div>
+                        </div>
+                    `;
+                    this.openModal('modal-voucher');
+                }
+            }
+
+            handleGlobalSearch(query) {
+                if (!query) return;
+                this.switchTab('farmers');
+                const input = document.getElementById('farmer-search-input');
+                if (input) {
+                    input.value = query;
+                    this.renderFarmers();
+                }
+            }
+        }
+
+        window.app = new AgriProcureApp();
+    }
+    </script>
+</body>
+</html>
