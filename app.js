@@ -151,16 +151,27 @@ class AgriProcureApp {
     populateDropdowns() {
         const farmerSelect = document.getElementById('in-farmer-id');
         const slotFarmerSelect = document.getElementById('slot-farmer-id');
-        if (farmerSelect && this.farmers.length > 0) {
-            farmerSelect.innerHTML = this.farmers.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
+        const farmersFallback = this.farmers.length > 0 ? this.farmers : [
+            { id: 1, name: 'Rameshwar Prasad', village: 'Rampur', farmer_code: 'F-1001' },
+            { id: 2, name: 'Suresh Kumar Patel', village: 'Sonpur', farmer_code: 'F-1002' },
+            { id: 3, name: 'Baldev Singh', village: 'Krishnapur', farmer_code: 'F-1003' },
+            { id: 4, name: 'Sunita Devi', village: 'Devpur', farmer_code: 'F-1004' }
+        ];
+        if (farmerSelect) {
+            farmerSelect.innerHTML = farmersFallback.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
         }
-        if (slotFarmerSelect && this.farmers.length > 0) {
-            slotFarmerSelect.innerHTML = this.farmers.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
+        if (slotFarmerSelect) {
+            slotFarmerSelect.innerHTML = farmersFallback.map(f => `<option value="${f.id}">${f.name} (${f.village} - ${f.farmer_code || f.id})</option>`).join('');
         }
 
         const centerSelect = document.getElementById('slot-center-id');
-        if (centerSelect && this.centers.length > 0) {
-            centerSelect.innerHTML = this.centers.map(c => `<option value="${c.id}">${c.name} (${c.district})</option>`).join('');
+        if (centerSelect) {
+            const centersToShow = this.centers.length > 0 ? this.centers : [
+                { id: 1, name: 'Central Grain Mandi Lucknow', district: 'Lucknow' },
+                { id: 2, name: 'Regional Procurement Hub Lakhimpur', district: 'Lakhimpur' },
+                { id: 3, name: 'Sitapur Grains & Oilseed Depot', district: 'Sitapur' }
+            ];
+            centerSelect.innerHTML = centersToShow.map(c => `<option value="${c.id}">${c.name} (${c.district})</option>`).join('');
         }
 
         const wbTokenSelect = document.getElementById('wb-token-select');
@@ -255,6 +266,94 @@ class AgriProcureApp {
                     this.clearFieldStatus(aadhaarInput, 'err-f-aadhaar');
                 }
             });
+
+        // 4. Full name live validation
+        const nameInput = document.getElementById('f-name');
+        if (nameInput) {
+            nameInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                if (val.length >= 3 && /^[a-zA-Z\s.]+$/.test(val)) {
+                    this.setFieldValid(nameInput, 'err-f-name');
+                } else {
+                    this.clearFieldStatus(nameInput, 'err-f-name');
+                }
+            });
+            nameInput.addEventListener('blur', (e) => {
+                const val = e.target.value.trim();
+                if (val.length < 3 || !/^[a-zA-Z\s.]+$/.test(val)) {
+                    this.setFieldError(nameInput, 'err-f-name', 'Name must contain only alphabets (min 3 chars)');
+                } else {
+                    this.setFieldValid(nameInput, 'err-f-name');
+                }
+            });
+        }
+
+        // 5. Village live validation
+        const villageInput = document.getElementById('f-village');
+        if (villageInput) {
+            villageInput.addEventListener('blur', (e) => {
+                const val = e.target.value.trim();
+                if (val.length < 2) {
+                    this.setFieldError(villageInput, 'err-f-village', 'Village name is required');
+                } else {
+                    this.setFieldValid(villageInput, 'err-f-village');
+                }
+            });
+        }
+
+        // 6. Land acres live validation
+        const landInput = document.getElementById('f-land');
+        if (landInput) {
+            landInput.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val) && val > 0 && val <= 500) {
+                    this.setFieldValid(landInput, 'err-f-land');
+                } else {
+                    this.clearFieldStatus(landInput, 'err-f-land');
+                }
+            });
+            landInput.addEventListener('blur', (e) => {
+                const val = parseFloat(e.target.value);
+                if (isNaN(val) || val <= 0 || val > 500) {
+                    this.setFieldError(landInput, 'err-f-land', 'Land must be between 0.1 and 500 acres');
+                } else {
+                    this.setFieldValid(landInput, 'err-f-land');
+                }
+            });
+        }
+
+        // 7. Bank name live validation
+        const bankNameInput = document.getElementById('f-bank-name');
+        if (bankNameInput) {
+            bankNameInput.addEventListener('blur', (e) => {
+                const val = e.target.value.trim();
+                if (val.length < 3) {
+                    this.setFieldError(bankNameInput, 'err-f-bank-name', 'Bank name is required');
+                } else {
+                    this.setFieldValid(bankNameInput, 'err-f-bank-name');
+                }
+            });
+        }
+
+        // 8. Bank account live validation (already exists but enhance)
+        const bankAccInput = document.getElementById('f-bank-acc');
+        if (bankAccInput) {
+            bankAccInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\\D/g, '').slice(0, 18);
+                if (e.target.value.length >= 9 && e.target.value.length <= 18) {
+                    this.setFieldValid(bankAccInput, 'err-f-bank-acc');
+                } else {
+                    this.clearFieldStatus(bankAccInput, 'err-f-bank-acc');
+                }
+            });
+            bankAccInput.addEventListener('blur', (e) => {
+                if (e.target.value.length < 9 || e.target.value.length > 18) {
+                    this.setFieldError(bankAccInput, 'err-f-bank-acc', 'Account number must be 9 to 18 digits');
+                } else {
+                    this.setFieldValid(bankAccInput, 'err-f-bank-acc');
+                }
+            });
+        }
             aadhaarInput.addEventListener('blur', (e) => {
                 const digits = e.target.value.replace(/\D/g, '');
                 if (digits.length !== 12 || !/^[2-9]\d{11}$/.test(digits)) {
